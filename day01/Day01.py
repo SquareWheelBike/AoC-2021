@@ -1,1 +1,0 @@
-# dummy outline for day 1 advent of code

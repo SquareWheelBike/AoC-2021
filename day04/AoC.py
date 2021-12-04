@@ -1,6 +1,6 @@
 import sys
 
-# AoC template for python3
+# AoC day 3
 
 # boards is a list of lists with 5 rows and 5 columns
 def checkwin(boards:list, calls:list, wins:list=[]):
@@ -24,12 +24,13 @@ def main():
     f = [l.strip() for l in open(sys.argv[1], 'r')]
 
     # PART 1
-    # need a list of words in line 1
+    # need a list of calls in line 1
     calls = [int(n) for n in f[0].split(',')]
+
     # now we need to injest the boards
     # each board is a list of 5 lists
     nboards = int(len(f) / 6)
-    boards = [[[int(l) for l in j.split()] for j in f[(k*6+2):(k*6+7)]] for k in range(nboards)]
+    boards = [[[int(l) for l in j.split()] for j in f[(k*6+2):(k*6+7)]] for k in range(nboards)] # this was a nightmate to write but it works
     
     for i in range(1, len(calls)):
         # check if any boards have a row or column where all entries are in calls
@@ -57,11 +58,9 @@ def main():
                 win = wins[-1]
                 print(win)
                 s = sum([sum([c for c in r if c not in calls[:i+1]]) for r in win])
-                # print(s)
-                # print(calls[i])
                 print("Part 2:", s * calls[i])
                 break
-            i -= 1 # go recheck for multiple wins
+            i -= 1 # go recheck for multiple wins, this isn't necessary but it prevents the wins happening out of order
         i += 1
 
 # I need to get into the habit of using the main function

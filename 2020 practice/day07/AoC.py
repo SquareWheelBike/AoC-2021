@@ -47,14 +47,13 @@ def main():
     # the bagmap is a dictionary of bags and what they can contain
     bagmap = {b:c for b,c in zip(bags, contents)}
 
+    # PART 1
+    # this is a recursive algotithm, we follow the path of bags to calculate how many base bags we have
+    # count the number of bags that contain gold
     cache = {}  # record all bags that contain gold, key=true if yes, false if no (prevents loops)
     # cache will be a dictionary of bags and what they can contain
     for b in bagmap:
         contains(b, "shiny gold", bagmap, cache) # call with the cache for all bags, cache will prevent repeated calculations
-
-    # PART 1
-    # this is a recursive algotithm, we follow the path of bags to calculate how many base bags we have
-    # count the number of bags that contain gold
     print(sum([1 for b in cache if cache[b]]))
 
     # PART 2

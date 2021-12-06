@@ -50,7 +50,7 @@ def main():
         for j in o2:
             if j[i] == bit:
                 ro2.append(j)
-                
+
         if countbits(co2, nbits)[i] >= 0:
             bit = "1"
         else:

@@ -1,5 +1,4 @@
-import sys, time
-from multiprocessing import Process, Queue
+import sys
 
 # AoC template for python3
 

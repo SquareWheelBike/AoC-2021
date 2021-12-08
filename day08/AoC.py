@@ -15,35 +15,39 @@ for x in sevenseg.keys():
 def part2(l:list[str], r:list[str]) -> int:
     
     # mapping is a dict from str -> int, str is left side str, int is digit it corresponds to
-        mapping = {}
-        for i in l:
-            for x in uniquelen:
-                if len(i) == len(uniquelen[x]):
-                    # print(i, x)
-                    mapping[i] = x
-                    break
+    mapping = {}
 
-        # now that we have an initial mapping, we can use it to find whatever remaining digits. 
+    # start by finding the given digits from part 1
+    for i in l:
+        for x in uniquelen:
+            if len(i) == len(uniquelen[x]):
+                # print(i, x)
+                mapping[i] = x
+                break
 
-        count = {}
-        for x in l:
-            if x in mapping.keys():
-                continue
-            count[x] = sum([sum([1 for ch in x if ch in m]) for m in mapping])
-        # count: str -> count
-        # matches: count -> digit
-        for s, c in count.items():
-            mapping[s] = matches[c]     
+    # now that we have an initial mapping, we can use it to find whatever remaining digits. 
 
-        # now that we have a mapping, we can use it to find the right side digits
-        output = ""
-        for i in r: # for each right side digit
-            for x in mapping: # compare to each mapping
-                if set(i) == set(x):
-                    output += str(mapping[x])
-                    break
+    count = {}
+    for x in l:
+        if x in mapping.keys():
+            continue
+        count[x] = sum([sum([1 for ch in x if ch in m]) for m in mapping])
+    # count overlap is unique for each unknown, if comparing to the known set
+    # so, we can use that mapping, along with the mapping of sevenseg known digits, to find each digitstring
+    # count: str -> count
+    # matches: count -> digit
+    for s, c in count.items():
+        mapping[s] = matches[c]     
 
-        return int(output)
+    # now that we have a mapping, we can use it to find the right side digits
+    output = ""
+    for i in r: # for each right side digit
+        for x in mapping: # compare to each mapping
+            if set(i) == set(x):
+                output += str(mapping[x])
+                break
+
+    return int(output)
 
 
 

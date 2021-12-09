@@ -1,5 +1,9 @@
 import sys
 
+# DOES NOT WORK
+
+# only kept it around because it's so bad that it's funny
+
 sevenseg = {1:"cf", 2:"acdeg", 3:"acdfg", 4:"bcdf", 5:"abdfg", 6:"abdefg", 7:"acf", 8:"abcdefg", 9:"abcdfg", 0:"abcefg"}  # dictionary of segments
 
 uniquelen = {x:sevenseg[x] for x in sevenseg if x in [1,4,7,8]}

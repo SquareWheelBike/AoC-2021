@@ -33,7 +33,6 @@ def main():
                 lanternfish[x] = 6
                 lanternfish.append(8)
     print("PART 1:", len(lanternfish))
-    
 
     # if you make a call per fish, it will never finish
     # I think a dynamic programming solution is possible

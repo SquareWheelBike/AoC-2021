@@ -17,6 +17,6 @@ def main():
     print("Part 1:", part1(deepcopy(f)))
     print("Part 2:", part2(deepcopy(f)))
 
-# I need to get into the habit of using the main function
+
 if __name__ == "__main__":
     main()

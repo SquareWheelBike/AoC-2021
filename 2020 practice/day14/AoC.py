@@ -22,40 +22,45 @@ def part1(f):
     for line in f:
         if line.startswith('mask'):
             mask = parsemask(line[7:])
-            # print(bin(mask[0]), bin(mask[1]))
         else:
             pos, val = [int(i) for i in line.replace("mem[","").split("] = ")]
-            # print(pos, val)
             val &= mask[0]
             val |= mask[1]
             mem[pos] = val
     return sum(mem.values())
 
-# returns a list tuples of masks from parsemask for each possible floating point
-def parsefloating(line):
-    l = len(line)
+# returns a list of int addresses to write to
+def parseaddr(addr, mask):
+    addr = bin(addr)[2:] # change address to binary representation
+    addr = '0' * (len(mask) - len(addr)) + addr # pad with 0's for processing
     # masks is a list of integers
-    masks = [parsemask(line)[1]] # starting point is all the ones positions
-    for i, ch in enumerate(line):
-        if ch == 'X':
-            masks.extend([m | (1 << (l - i - 1)) for m in masks]) # extend the list with the new masks
-    return [parsemask(str(bin(line)[2:])) for line in masks]
+    result = []
+    for a, m in zip(addr, mask):
+        if m == '1' or m == 'X':
+            result.append(m)
+        else:
+            result.append(a)
+    result = ''.join(result) # convert to string
+    # now, compute every possible result of each mask, start with each x as 0 and then add each combination of x's as ones
+    addresses = [result.replace('X', '0')]
+    for i, m in enumerate(result):
+        if m == 'X':
+            for a in addresses.copy():
+                addresses.append(a[:i] + '1' + a[i+1:])
+    addresses = [int(a, 2) for a in addresses]
+    return addresses
 
 def part2(f):
     # f is the list of input strings
     # if it starts with a 'mask', then we set the mask
-    masks = None
+    mask = None
     mem = {}
     for line in f:
         if line.startswith('mask'):
-            masks = parsefloating(line[7:])
-            # print(masks)
+            mask = line[7:]
         else:
             pos, val = [int(i) for i in line.replace("mem[","").split("] = ")]
-            # print(pos, val)
-            addresses = [(pos & mask[0]) | mask[1] for mask in masks]
-            # print(addresses)
-            for a in addresses:
+            for a in parseaddr(pos, mask):
                 mem[a] = val
     return sum(mem.values())
 

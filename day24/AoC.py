@@ -14,7 +14,7 @@ def inp(line, w):
 def add(line):
     assert(line[0] == 'add' and len(line) == 3 and line[1] in globalvars)
     x, y = line[1], line[2]
-    a = globalvars[x] if x in globalvars else int(x)
+    a = globalvars[x]
     b = globalvars[y] if y in globalvars else int(y)
     globalvars[x] = a + b
     return True
@@ -22,7 +22,7 @@ def add(line):
 def mul(line):
     assert(line[0] == 'mul' and len(line) == 3 and line[1] in globalvars)
     x, y = line[1], line[2]
-    a = globalvars[x] if x in globalvars else int(x)
+    a = globalvars[x]
     b = globalvars[y] if y in globalvars else int(y)
     globalvars[x] = a * b
     return True
@@ -30,7 +30,7 @@ def mul(line):
 def div(line):
     assert(line[0] == 'div' and len(line) == 3 and line[1] in globalvars)
     x, y = line[1], line[2]
-    a = globalvars[x] if x in globalvars else int(x)
+    a = globalvars[x]
     b = globalvars[y] if y in globalvars else int(y)
     if b == 0:
         return False
@@ -40,7 +40,7 @@ def div(line):
 def mod(line):
     assert(line[0] == 'mod' and len(line) == 3 and line[1] in globalvars)
     x, y = line[1], line[2]
-    a = globalvars[x] if x in globalvars else int(x)
+    a = globalvars[x]
     b = globalvars[y] if y in globalvars else int(y)
     if b <= 0 or a < 0:
         return False
@@ -50,7 +50,7 @@ def mod(line):
 def eql(line):
     assert(line[0] == 'eql' and len(line) == 3 and line[1] in globalvars)
     x, y = line[1], line[2]
-    a = globalvars[x] if x in globalvars else int(x)
+    a = globalvars[x]
     b = globalvars[y] if y in globalvars else int(y)
     globalvars[x] = int(a == b)
 
@@ -82,19 +82,22 @@ def runprog(f, inputs):
 
 # for each position, try current position, up one, and down one
 # if any of those are in the list, then it's a duplicate
-def part1(f):
-    inpsize = sum([1 for l in f if l.split()[0] == 'inp'])
+def part1(f, cl):
+    inpsize = sum([1 for l in f if l.split()[0] == 'inp']) - 2
     # tries = {}  # integers tried so far
     testcombos = [[9,8,7,6,5,4,3,2,1]] * inpsize
     for p in product(*testcombos):
-        if runprog(f, list(p)):
+        p = [9, cl] + list(p)
+        if runprog(f, p):
             return int(''.join(map(str, p)))
     return 0
 
 def main():
     f = [l.strip() for l in open(sys.argv[1], 'r')]
-    print(part1(deepcopy(f)))
+    cl = 9
+    print(part1(deepcopy(f), cl))
     # print(part2(deepcopy(f)))
+    # py AoC.py input.txt
 
 if __name__ == "__main__":
     main()

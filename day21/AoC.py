@@ -1,6 +1,5 @@
 import sys
-from itertools import product, count, permutations
-from copy import deepcopy
+from itertools import product
 from functools import cache
 
 def part1(p1, p2) -> int:
@@ -23,13 +22,28 @@ def part1(p1, p2) -> int:
         if p2score >= 1000:
             return p1score * (d100 - 1)
 
-possiblerolls = list({sum(p) for p in permutations([1,2,3], 3)}) # all possible roll scores for each turn, only one entry for each possibliity
+possiblerolls = [sum(p) for p in product(*([[1,2,3]] * 3))] # all possible roll scores for each turn, only one entry for each possibliity
 
 # for each roll, create three copies of the next move
 # return is tuple ints of how many times each player can win from here
 @cache
-def part2(p1:int, p2:int, p1score:int, p2score:int) -> tuple:
-    return 0
+def part2(p1:int, p2:int, p1score:int, p2score:int, p1turn:bool) -> tuple:
+    if p1score >= 21:
+        return (1,0)
+    if p2score >= 21:
+        return (0,1)
+    results = []
+    if p1turn:
+        for p in possiblerolls:
+            newpos = (p1 + p - 1) % 10 + 1
+            newp1score = p1score + newpos
+            results.append(part2(newpos, p2, newp1score, p2score, False))
+    else:
+        for p in possiblerolls:
+            newpos = (p2 + p - 1) % 10 + 1
+            newp2score = p2score + newpos
+            results.append(part2(p1, newpos, p1score, newp2score, True))
+    return tuple(sum(r) for r in zip(*results))
 
 def main():
     # start by getting file as a list of strings
@@ -37,7 +51,7 @@ def main():
     starts = [int(l.split()[-1]) for l in f]
 
     print("Part 1:", part1(*starts))
-    print("Part 2:", max(part2(*starts, 0, 0)))
+    print("Part 2:", max(part2(*starts, 0, 0, True)))
 
 
 if __name__ == "__main__":

@@ -22,7 +22,7 @@ def part1(p1, p2) -> int:
         if p2score >= 1000:
             return p1score * (d100 - 1)
 
-possiblerolls = [sum(p) for p in product(*([[1,2,3]] * 3))] # all possible roll scores for each turn, only one entry for each possibliity
+possiblerolls = [sum(p) for p in product([1,2,3], repeat=3)] # all possible roll scores for each turn, only one entry for each possibliity
 
 # for each roll, create three copies of the next move
 # return is tuple ints of how many times each player can win from here

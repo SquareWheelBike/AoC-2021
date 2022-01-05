@@ -1,103 +1,58 @@
 import sys
-from itertools import product, count, permutations
-from copy import deepcopy
 
-globalvars = {'w': 0, 'x': 0, 'y': 0, 'z': 0}
+def isvalid(prog, digits):
+    z = 0
+    for digit, dmo in zip(digits, prog):
+        divisor, modifier, offset = dmo
+        if z % 26 + offset == digit:
+            z = z // divisor
+        else:
+            z = (z // divisor) * 26 + digit + modifier
+    return not z
 
-# inp a - Read an input value and write it to variable a.
-def inp(line, w):
-    assert(line[0] == 'inp' and len(line) == 2)
-    a = line[1]
-    globalvars[a] = int(w)
-    return True
+def parseprog(f):
+    prog = []
+    for i in range(0, 252, 18):
+        prog.append((int(f[i+4].split()[-1]), int(f[i+5].split()[-1]), int(f[i+15].split()[-1])))
+    return prog
 
-def add(line):
-    assert(line[0] == 'add' and len(line) == 3 and line[1] in globalvars)
-    x, y = line[1], line[2]
-    a = globalvars[x]
-    b = globalvars[y] if y in globalvars else int(y)
-    globalvars[x] = a + b
-    return True
-
-def mul(line):
-    assert(line[0] == 'mul' and len(line) == 3 and line[1] in globalvars)
-    x, y = line[1], line[2]
-    a = globalvars[x]
-    b = globalvars[y] if y in globalvars else int(y)
-    globalvars[x] = a * b
-    return True
-
-def div(line):
-    assert(line[0] == 'div' and len(line) == 3 and line[1] in globalvars)
-    x, y = line[1], line[2]
-    a = globalvars[x]
-    b = globalvars[y] if y in globalvars else int(y)
-    if b == 0:
-        return False
-    globalvars[x] = a // b
-    return True
-
-def mod(line):
-    assert(line[0] == 'mod' and len(line) == 3 and line[1] in globalvars)
-    x, y = line[1], line[2]
-    a = globalvars[x]
-    b = globalvars[y] if y in globalvars else int(y)
-    if b <= 0 or a < 0:
-        return False
-    globalvars[x] = a % b
-    return True
-
-def eql(line):
-    assert(line[0] == 'eql' and len(line) == 3 and line[1] in globalvars)
-    x, y = line[1], line[2]
-    a = globalvars[x]
-    b = globalvars[y] if y in globalvars else int(y)
-    globalvars[x] = int(a == b)
-
-# inputs is a stack of the 14 characters to take, already in int form
-def evalline(line, inputs=None):
-    if line[0] == 'inp':
-        return inp(line, inputs.pop(0))
-    elif line[0] == 'add':
-        return add(line)
-    elif line[0] == 'mul':
-        return mul(line)
-    elif line[0] == 'div':
-        return div(line)
-    elif line[0] == 'mod':
-        return mod(line)
-    elif line[0] == 'eql':
-        return eql(line)
+def find_digits(left: int, right: int, find_max: bool = True):
+    if find_max:
+        if left + right <= 0:
+            return 9, 9 + left + right
+        else:
+            return 9 - left - right, 9
     else:
-        return False
+        if left + right <= 0:
+            return 1 - left - right, 1
+        else:
+            return 1, 1 + left + right
 
-def runprog(f, inputs):
-    # if any(1 > i > 9 for i in inputs):
-    #     return False
-    globalvars = {'w': 0, 'x': 0, 'y': 0, 'z': 0}   # reset program before starting
-    for line in f:
-        if not evalline(line.split(), inputs):
-            return False
-    return globalvars['z'] == 0 # success if w is 0 and program finishes
+def calculate_version(instructions, find_max: bool = True) -> int:
+    # very little idea of how this works, adapted it from someone else's solution
+    instruction_sets = parseprog(instructions)
+    version_number_digits: List = [None] * len(instruction_sets)
+    left_digit_stack = []
+    for i in range(len(instruction_sets)):
+        if instruction_sets[i][0] == 1:
+            left_digit_stack.append((i, instruction_sets[i]))
+        else:
+            left_i, left_instruction_set = left_digit_stack.pop()
+            left_increment = left_instruction_set[2]
+            right_increment = instruction_sets[i][1]
+            version_number_digits[left_i], version_number_digits[i] = find_digits(left_increment, right_increment, find_max)
+    return int(''.join([str(d) for d in version_number_digits]))
 
-# for each position, try current position, up one, and down one
-# if any of those are in the list, then it's a duplicate
-def part1(f, cl):
-    inpsize = sum([1 for l in f if l.split()[0] == 'inp']) - 2
-    # tries = {}  # integers tried so far
-    testcombos = [[9,8,7,6,5,4,3,2,1]] * inpsize
-    for p in product(*testcombos):
-        p = [9, cl] + list(p)
-        if runprog(f, p):
-            return int(''.join(map(str, p)))
-    return 0
+def part1(f):
+    return calculate_version(f)
+
+def part2(f):
+    return calculate_version(f, False)
 
 def main():
     f = [l.strip() for l in open(sys.argv[1], 'r')]
-    cl = 9
-    print(part1(deepcopy(f), cl))
-    # print(part2(deepcopy(f)))
-    # py AoC.py input.txt
+    print(part1(f))
+    print(part2(f))
 
 if __name__ == "__main__":
     main()
